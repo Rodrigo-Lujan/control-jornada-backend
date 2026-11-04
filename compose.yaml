@@ -1,19 +1,19 @@
 services:
   db:
-    image: postgres:17
+    image: pg:bennu
     container_name: control-jornada-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: control_jornada_db
-      POSTGRES_USER: control_jornada_admin
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       TZ: America/Lima
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
-      - control-jornada-db-data:/var/lib/postgresql/data
+      - pg2_data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U control_jornada_admin -d control_jornada_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -25,8 +25,8 @@ services:
     container_name: control-jornada-backend
     restart: unless-stopped
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/control_jornada_db?currentSchema=bd
-      SPRING_DATASOURCE_USERNAME: control_jornada_admin
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}?currentSchema=public
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
       PORT: 8080
@@ -37,5 +37,6 @@ services:
         condition: service_healthy
 
 volumes:
-  control-jornada-db-data:
-    name: control-jornada-db-data
+  pg2_data:
+    external: true
+    name: rodri_pg2_data
