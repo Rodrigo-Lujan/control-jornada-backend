@@ -16,8 +16,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 public class JobType extends BaseDomain implements Serializable {
 
     private String name;
-    private Long companyId;
-    private Long branchId;
+    private Company company;
+    private Branch branch;
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static JobType valueOf(Long id) {
